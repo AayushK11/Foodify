@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "69668628139",
+    "project_id": "click2code-9b64e",
+    "storage_bucket": "click2code-9b64e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:69668628139:android:843ef3912a66bc528f39ee",
+        "android_client_info": {
+          "package_name": "com.example.click_to_cook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "69668628139-naotbchv015426kh2psj616kt9ui4k5s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.click_to_cook",
+            "certificate_hash": "d1e07fc3c38094ce21102c60e88b4a70aecfe298"
+          }
+        },
+        {
+          "client_id": "69668628139-s65o33que94rftt32iu40lh8uajagtuv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4XIJEhPCJYdgrIpMqgYQ6fdOlmgU3irI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "69668628139-s65o33que94rftt32iu40lh8uajagtuv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
