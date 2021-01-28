@@ -7,6 +7,18 @@ from keras.layers.convolutional import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import BatchNormalization, Dense, Dropout, Flatten
 from tensorflow.keras.models import Sequential
 
+# CREATES A ML MODEL THAT GETS SAVED IN THE MODEL FOLDER
+
+# Create Model specifies the model structure, and fits the data onto it
+# The Model's specifications are:
+# 2 Conv Layers [(32,3x3,same,relu),(64,4x4,same,relu)]
+# 2 Max Pooling Layers [(3x3),(4x4)]
+# 2 BatchNormalizations
+# 2 Dense Layers [(128,relu),(classes,softmax)]
+# 3 Dropouts [(0.5),(0.35),(0.35)]
+# Trained on a batch size of 16, for 200 epochs with the Adam optimizer
+# 99.35% Train Accuracy and 95.26% Test Accuracy
+
 
 def create_model(xtr, ytr, xte, yte):
     model = Sequential()
@@ -31,7 +43,7 @@ def create_model(xtr, ytr, xte, yte):
     )
 
     history = model.fit(
-        x=xtr, y=ytr, batch_size=16, epochs=500, validation_data=(xte, yte)
+        x=xtr, y=ytr, batch_size=16, epochs=200, validation_data=(xte, yte)
     )
 
     model.evaluate(xte, yte)
