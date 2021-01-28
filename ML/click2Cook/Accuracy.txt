@@ -1,0 +1,5 @@
+Final Epoch:
+33/33 [==============================] - 0s 7ms/step - loss: 0.0259 - accuracy: 0.9935 - val_loss: 0.1662 - val_accuracy: 0.9526
+
+Testing:
+6/6 [==============================] - 0s 2ms/step - loss: 0.1662 - accuracy: 0.9526

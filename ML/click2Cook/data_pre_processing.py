@@ -62,4 +62,4 @@ def preprocess_handler():
     return xtr, ytr, xte, yte
 
 
-preprocess_handler()
+# preprocess_handler()
