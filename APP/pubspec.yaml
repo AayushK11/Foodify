@@ -38,6 +38,7 @@ dependencies:
   vibration: ^1.7.3
   dio: ^3.0.8
   toast: ^0.1.5
+  sliding_up_panel: ^1.0.2
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +80,12 @@ flutter:
     - family: Balsamiq Sans
       fonts:
         - asset: assets/fonts/Balsamiq_Sans/BalsamiqSans-Bold.ttf
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato/Lato-Regular.ttf
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto/Roboto-Medium.ttf
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

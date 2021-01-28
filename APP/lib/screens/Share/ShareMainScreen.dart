@@ -1,16 +1,18 @@
-import 'package:click_to_cook/screens/Recipe/RecipeCapture.dart';
+import 'package:click_to_cook/screens/Share/ShareCapture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
-import '../constants.dart';
-import 'Share/ShareMainScreen.dart';
 
-class MainScreen extends StatefulWidget {
+import '../../constants.dart';
+import 'ShareDetailScreen.dart';
+import 'ShareScreen.dart';
+
+class ShareMainScreen extends StatefulWidget {
   @override
-  _MainScreenState createState() => _MainScreenState();
+  _ShareMainScreenState createState() => _ShareMainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _ShareMainScreenState extends State<ShareMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +41,7 @@ class _MainScreenState extends State<MainScreen> {
                         PageTransition(
                           duration: Duration(seconds: 1),
                           type: PageTransitionType.fade,
-                          child: RecipeCapture(),
+                          child: ShareScreen(),
                         ));
                   },
                   shape: RoundedRectangleBorder(
@@ -49,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
-                      'click2cook',
+                      'I want to Eat',
                       style: TextStyle(
                         fontSize: 40,
                         color: primaryAppColor,
@@ -64,8 +66,9 @@ class _MainScreenState extends State<MainScreen> {
                     Navigator.push(
                         context,
                         PageTransition(
+                          duration: Duration(seconds: 1),
                           type: PageTransitionType.fade,
-                          child: ShareMainScreen(),
+                          child: ShareCapture(),
                         ));
                   },
                   shape: RoundedRectangleBorder(
@@ -75,7 +78,7 @@ class _MainScreenState extends State<MainScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
-                      'click2share',
+                      'I want to Share',
                       style: TextStyle(
                         fontSize: 40,
                         color: primaryAppColor,
