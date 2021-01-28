@@ -1,8 +1,8 @@
 from apiclient.discovery import build
 from recipe_scrapers import scrape_me
 import time
-import cvlib as cv
 from endpoints.models import Image, IPADDR
+from ML.click2cook.model_prediction import predict_img
 
 
 def get_client_ip(request):
@@ -15,7 +15,11 @@ def get_client_ip(request):
 
 
 def recog_img(img):
-    pass
+    result = predict_img(img)
+    print(result)
+
+
+recog_img("test.jpg")
 
 
 def recipe_gen(query):
