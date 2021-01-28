@@ -1,5 +1,4 @@
 Image Scraping - Click To Cook
-_______________________________________________
 Data Pre Processing (Images) - Click To Cook
 Data Pre Processing (Labels) - Click To Cook
 Model Generation - Click To Cook
@@ -7,6 +6,7 @@ Model Graph - Click To Cook
 Model Save - Click To Cook
 Model Prediction Processing - Click To Cook
 Model Test Run - Click To Cook
+_______________________________________________
 Image Scraping - Click To Share
 Data Pre Processing (Images) - Click To Share
 Data Pre Processing (Labels) - Click To Share
