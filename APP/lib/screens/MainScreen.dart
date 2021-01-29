@@ -48,12 +48,15 @@ class _MainScreenState extends State<MainScreen> {
                   color: textColor,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      'click2cook',
-                      style: TextStyle(
-                        fontSize: 40,
-                        color: primaryAppColor,
-                        fontFamily: primaryFont,
+                    child: Hero(
+                      tag: 'container1',
+                      child: Text(
+                        'click2cook',
+                        style: TextStyle(
+                          fontSize: 30,
+                          color: primaryAppColor,
+                          fontFamily: primaryFont,
+                        ),
                       ),
                     ),
                   ),
@@ -74,12 +77,15 @@ class _MainScreenState extends State<MainScreen> {
                   color: textColor,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      'click2share',
-                      style: TextStyle(
-                        fontSize: 40,
-                        color: primaryAppColor,
-                        fontFamily: primaryFont,
+                    child: Hero(
+                      tag: 'container2',
+                      child: Text(
+                        'click2share',
+                        style: TextStyle(
+                          fontSize: 30,
+                          color: primaryAppColor,
+                          fontFamily: primaryFont,
+                        ),
                       ),
                     ),
                   ),

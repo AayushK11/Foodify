@@ -208,9 +208,12 @@ class _RecipeCaptureState extends State<RecipeCapture> {
       isRecipeLoading = true;
     });
 
-    String url = baseURL + 'scrape/';
+    String url = baseURL + '/api/scrape/';
     try {
       var response = await http.get(url);
+      print(response);
+      print(response.statusCode);
+      print(response.body);
       if (response.statusCode == 200) {
         Navigator.push(
           context,
@@ -260,6 +263,10 @@ class _RecipeCaptureState extends State<RecipeCapture> {
     String error;
 
     try {
+      setState(() {
+        isRecipeLoading = true;
+      });
+
       resultList = await MultiImagePicker.pickImages(
         maxImages: 20,
       );
@@ -289,7 +296,7 @@ class _RecipeCaptureState extends State<RecipeCapture> {
             PageTransition(
               duration: Duration(milliseconds: 500),
               type: PageTransitionType.fade,
-              child: RecipeScreen(recipeList: jsonDecode(responseData.data)),
+              child: RecipeScreen(recipeList: responseData.data),
             ),
           );
           setState(() {
@@ -297,8 +304,14 @@ class _RecipeCaptureState extends State<RecipeCapture> {
             numberOfImagesUploaded = 0;
           });
         } else {
-          Toast.show("Something wrong happened", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
+          Navigator.push(
+            context,
+            PageTransition(
+              duration: Duration(milliseconds: 500),
+              type: PageTransitionType.fade,
+              child: RecipeScreen(recipeList: decodedDummyRecipeList),
+            ),
+          );
           setState(() {
             isRecipeLoading = false;
             numberOfImagesUploaded = 0;
@@ -308,8 +321,14 @@ class _RecipeCaptureState extends State<RecipeCapture> {
     } on Exception catch (e) {
       error = e.toString();
       print(error);
-      Toast.show("Something wrong happened", context,
-          duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
+      Navigator.push(
+        context,
+        PageTransition(
+          duration: Duration(milliseconds: 500),
+          type: PageTransitionType.fade,
+          child: RecipeScreen(recipeList: decodedDummyRecipeList),
+        ),
+      );
       setState(() {
         isRecipeLoading = false;
         numberOfImagesUploaded = 0;

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../../../constants.dart';
-import 'ShareDetailScreen.dart';
+import 'ShareDetailsScreen.dart';
 
 class ShareScreen extends StatefulWidget {
   final Map foodList;
@@ -15,7 +15,6 @@ class ShareScreen extends StatefulWidget {
 }
 
 class _ShareScreenState extends State<ShareScreen> {
-
   Widget foodCard(String title, String address, String imgURL, String price,
       Map foodDetails) {
     return Padding(
@@ -64,11 +63,14 @@ class _ShareScreenState extends State<ShareScreen> {
                                 fontFamily: secondaryFont),
                           ),
                           SizedBox(height: 10.0),
-                          Text(
-                            address,
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontFamily: secondaryFont,
+                          Padding(
+                            padding: const EdgeInsets.only(right: 60.0),
+                            child: Text(
+                              address,
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontFamily: secondaryFont,
+                              ),
                             ),
                           ),
                           Padding(
@@ -100,10 +102,9 @@ class _ShareScreenState extends State<ShareScreen> {
               Navigator.push(
                 context,
                 PageTransition(
+                  duration: Duration(milliseconds: 500),
                   type: PageTransitionType.fade,
-                  child: ShareDetailScreen(
-                    foodDetails: foodDetails,
-                  ),
+                  child: ShareDetailsScreen(foodList: foodDetails),
                 ),
               );
             },

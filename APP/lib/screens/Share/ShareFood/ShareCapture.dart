@@ -16,6 +16,7 @@ import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
 import '../GetFood/ShareScreen.dart';
+import 'ShareProfileScreen.dart';
 
 class ShareCapture extends StatefulWidget {
   @override
@@ -30,7 +31,32 @@ class _ShareCaptureState extends State<ShareCapture> {
   bool isImageCaptured = false;
   String imagePath;
   String name, address, phone, price, description;
-  var image;
+  var image, galleryImage;
+
+  var dummyDecodedData = {
+    "result": [
+      {
+        "pk": 1,
+        "address": "202, NY, USA",
+        "phone_no": "1010101010",
+        "picture": "/media/foodposts/Screenshot_from_2021-01-22_13-55-21.png",
+        "name": "apple",
+        "coordinates": "SRID=4326;POINT (73.91947028216656 18.55971312983079)",
+        "price": "200",
+        "description": "yum yum"
+      },
+      {
+        "pk": 2,
+        "address": "202, NY, USA",
+        "phone_no": "1010101010",
+        "picture": "/media/foodposts/Screenshot_from_2021-01-22_13-55-21.png",
+        "name": "apple",
+        "coordinates": "SRID=4326;POINT (73.91947028216656 18.55971312983079)",
+        "price": "200",
+        "description": "yum yum"
+      }
+    ]
+  };
 
   @override
   void initState() {
@@ -96,18 +122,52 @@ class _ShareCaptureState extends State<ShareCapture> {
           Vibration.vibrate(duration: 50);
         }
 
+        print(value.path);
+
         String fileName = value.path.split('/').last;
         image = await MultipartFile.fromFile(
           value.path,
           filename: fileName,
         );
+        galleryImage = image;
+
+        setState(() {
+          imagePath = value.path;
+        });
+
+        Toast.show("Recognising Image", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
+
+        try {
+          //   FormData data = FormData.fromMap({
+          //     "image": image,
+          //   });
+          //
+          //   Dio dio = new Dio();
+          //   var responseData = await dio.post(
+          //     baseURL + "/api/share-image/",
+          //     data: data,
+          //   );
+          //
+          //   if (responseData != null) {
+          //     name = responseData.data['result'];
+          //   } else {
+          //     name = 'apple';
+          //     print("Something went wrong");
+          //   }
+        } catch (e) {
+          name = 'apple';
+          print("Something went wrong");
+          print(e);
+        }
 
         setState(() {
           isImageCaptured = true;
-          imagePath = value.path;
         });
       });
     } catch (e) {
+      name = 'apple';
+      print("Something went wrong");
       print(e);
     }
   }
@@ -134,6 +194,25 @@ class _ShareCaptureState extends State<ShareCapture> {
       }
       if (multipart.isNotEmpty) {
         image = multipart[0];
+        galleryImage = multipart[0];
+
+        // FormData data = FormData.fromMap({
+        //   "image": image,
+        // });
+
+        // Dio dio = new Dio();
+        // var responseData = await dio.post(
+        //   baseURL + "/api/share-image/",
+        //   data: data,
+        // );
+
+        // if (responseData != null) {
+        //   name = responseData.data['result'];
+        // } else {
+        name = 'apple';
+        //   print("Something went wrong");
+        // }
+
         setState(() {
           isImageCaptured = true;
         });
@@ -141,7 +220,7 @@ class _ShareCaptureState extends State<ShareCapture> {
     } on Exception catch (e) {
       error = e.toString();
       print(error);
-      Toast.show("Something wrong happened", context,
+      Toast.show("Something went wrong", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
     }
     if (!mounted) return;
@@ -162,7 +241,7 @@ class _ShareCaptureState extends State<ShareCapture> {
       FormData data = FormData.fromMap({
         "email": FirebaseAuth.instance.currentUser.email,
         "name": name,
-        "image": image,
+        "image": galleryImage,
         "phone_no": phone,
         "address": address,
         "lat": position.latitude,
@@ -170,7 +249,6 @@ class _ShareCaptureState extends State<ShareCapture> {
         "price": price,
         "description": description,
       });
-
 
       Dio dio = new Dio();
       var responseData = await dio.post(
@@ -184,7 +262,7 @@ class _ShareCaptureState extends State<ShareCapture> {
         Toast.show("Post Successful!", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
-        Toast.show("Something wrong happened", context,
+        Toast.show("Something went wrong", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
         Navigator.pop(context);
       }
@@ -195,12 +273,58 @@ class _ShareCaptureState extends State<ShareCapture> {
       });
     } catch (e) {
       print(e);
-      Toast.show("Something wrong happened", context,
+      Toast.show("Something went wrong", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
       setState(() {
         isImageCaptured = false;
         imagePath = null;
       });
+    }
+  }
+
+  loadProfile() async {
+    try {
+      Toast.show("Profile Loading...", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
+
+
+      FormData data = FormData.fromMap({
+        "email": FirebaseAuth.instance.currentUser.email,
+      });
+
+      Dio dio = new Dio();
+      var responseData = await dio.post(
+        baseURL + "/api/all-user-post/",
+        data: data,
+      );
+
+      if (responseData != null) {
+        print(responseData.data);
+        Navigator.push(
+          context,
+          PageTransition(
+            type: PageTransitionType.fade,
+            child: ShareProfileScreen(foodList: responseData.data),
+          ),
+        );
+      } else {
+        Navigator.push(
+          context,
+          PageTransition(
+            type: PageTransitionType.fade,
+            child: ShareProfileScreen(foodList: dummyDecodedData),
+          ),
+        );
+      }
+    } catch (e) {
+      print(e);
+      Navigator.push(
+        context,
+        PageTransition(
+          type: PageTransitionType.fade,
+          child: ShareProfileScreen(foodList: dummyDecodedData),
+        ),
+      );
     }
   }
 
@@ -278,7 +402,7 @@ class _ShareCaptureState extends State<ShareCapture> {
                         ),
                       )
                     : Hero(
-                        tag: 'container',
+                        tag: 'container2',
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
@@ -307,18 +431,19 @@ class _ShareCaptureState extends State<ShareCapture> {
                                   onChanged: (value) {
                                     name = value;
                                   },
+                                  controller: TextEditingController(text: name),
                                   decoration: InputDecoration(
                                     labelText: 'Item name',
                                     labelStyle: TextStyle(
                                       color: primaryAppColor,
                                     ),
                                     border: new OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: primaryAppColor),
+                                      borderSide:
+                                          BorderSide(color: primaryAppColor),
                                     ),
                                     focusedBorder: new OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: primaryAppColor),
+                                      borderSide:
+                                          BorderSide(color: primaryAppColor),
                                     ),
                                   ),
                                 ),
@@ -412,11 +537,11 @@ class _ShareCaptureState extends State<ShareCapture> {
                                     ),
                                     border: new OutlineInputBorder(
                                       borderSide:
-                                      BorderSide(color: primaryAppColor),
+                                          BorderSide(color: primaryAppColor),
                                     ),
                                     focusedBorder: new OutlineInputBorder(
                                       borderSide:
-                                      BorderSide(color: primaryAppColor),
+                                          BorderSide(color: primaryAppColor),
                                     ),
                                   ),
                                 ),
@@ -451,6 +576,45 @@ class _ShareCaptureState extends State<ShareCapture> {
                           ),
                         ),
                       ),
+              ),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Container(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: new RawMaterialButton(
+                      fillColor: primaryAppColor,
+                      elevation: 10.0,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              CupertinoIcons.doc_append,
+                              color: Colors.white,
+                              size: 25,
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              'My Posts',
+                              style: TextStyle(
+                                color: textColor,
+                                fontFamily: secondaryFont,
+                                fontSize: 17.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      onPressed: () {
+                        loadProfile();
+                      },
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

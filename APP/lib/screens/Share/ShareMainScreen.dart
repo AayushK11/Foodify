@@ -109,12 +109,26 @@ class _ShareMainScreenState extends State<ShareMainScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           SizedBox(width: double.infinity),
-          Hero(
-            tag: 'logo',
-            child: Image.asset(
-              'assets/images/logo.png',
-              scale: 4,
-            ),
+          Column(
+            children: [
+              Hero(
+                tag: 'logo',
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  scale: 4,
+                ),
+              ),
+              Center(
+                child: Text(
+                  'click2share',
+                  style: TextStyle(
+                    fontSize: 40,
+                    color: textColor,
+                    fontFamily: primaryFont,
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 30),
           Padding(
@@ -132,12 +146,15 @@ class _ShareMainScreenState extends State<ShareMainScreen> {
                   color: textColor,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      'I want to Eat',
-                      style: TextStyle(
-                        fontSize: 40,
-                        color: primaryAppColor,
-                        fontFamily: primaryFont,
+                    child: Hero(
+                      tag: 'container1',
+                      child: Text(
+                        'I want to Eat',
+                        style: TextStyle(
+                          fontSize: 30,
+                          color: primaryAppColor,
+                          fontFamily: primaryFont,
+                        ),
                       ),
                     ),
                   ),
@@ -159,12 +176,15 @@ class _ShareMainScreenState extends State<ShareMainScreen> {
                   color: textColor,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      'I want to Share',
-                      style: TextStyle(
-                        fontSize: 40,
-                        color: primaryAppColor,
-                        fontFamily: primaryFont,
+                    child: Hero(
+                      tag: 'container2',
+                      child: Text(
+                        'I want to Share',
+                        style: TextStyle(
+                          fontSize: 30,
+                          color: primaryAppColor,
+                          fontFamily: primaryFont,
+                        ),
                       ),
                     ),
                   ),
