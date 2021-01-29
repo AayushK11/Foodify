@@ -1,3 +1,13 @@
-from django.urls.conf import path
+from django.urls import path
+from endpoints import views
 
-urlpatterns = []
+urlpatterns = [
+    path("image/", views.get_image),
+    path("bulk-results/", views.bulk_images),
+    path("scrape/", views.get_recipes),
+    path("sign-up/", views.signup),
+    path("post-food/", views.post_food),
+    path("get-food/", views.get_food),
+    path("all-user-post/", views.particular_user_food),
+    path("delete-post/", views.delete_post),
+]
