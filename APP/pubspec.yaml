@@ -39,6 +39,7 @@ dependencies:
   dio: ^3.0.8
   toast: ^0.1.5
   sliding_up_panel: ^1.0.2
+  geolocator: ^6.1.14
 
 dev_dependencies:
   flutter_test:

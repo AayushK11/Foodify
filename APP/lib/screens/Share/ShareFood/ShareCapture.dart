@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:camera/camera.dart';
 import 'package:click_to_cook/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:toast/toast.dart';
@@ -10,7 +15,7 @@ import 'package:vibration/vibration.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
-import 'ShareScreen.dart';
+import '../GetFood/ShareScreen.dart';
 
 class ShareCapture extends StatefulWidget {
   @override
@@ -21,10 +26,29 @@ class _ShareCaptureState extends State<ShareCapture> {
   CameraController cameraController;
   List cameras;
   int selectedCameraIndex;
-  int numberOfImagesUploaded = 0;
   bool isRecipeLoading = false;
   bool isImageCaptured = false;
   String imagePath;
+  String name, address, phone, price, description;
+  var image;
+
+  @override
+  void initState() {
+    super.initState();
+    availableCameras().then((value) {
+      cameras = value;
+      if (cameras.length > 0) {
+        setState(() {
+          selectedCameraIndex = 0;
+        });
+        initCamera(cameras[selectedCameraIndex]).then((value) {});
+      } else {
+        print('No camera available');
+      }
+    }).catchError((e) {
+      print('Error : ${e.code}');
+    });
+  }
 
   Future initCamera(CameraDescription cameraDescription) async {
     if (cameraController != null) {
@@ -55,7 +79,7 @@ class _ShareCaptureState extends State<ShareCapture> {
 
   Widget cameraPreview() {
     if (cameraController == null || !cameraController.value.isInitialized) {
-      return Text('Loading');
+      return Scaffold(backgroundColor: Colors.black);
     }
 
     return AspectRatio(
@@ -63,6 +87,29 @@ class _ShareCaptureState extends State<ShareCapture> {
           MediaQuery.of(context).size.height,
       child: CameraPreview(cameraController),
     );
+  }
+
+  onCapture(context) async {
+    try {
+      await cameraController.takePicture().then((value) async {
+        if (await Vibration.hasVibrator()) {
+          Vibration.vibrate(duration: 50);
+        }
+
+        String fileName = value.path.split('/').last;
+        image = await MultipartFile.fromFile(
+          value.path,
+          filename: fileName,
+        );
+
+        setState(() {
+          isImageCaptured = true;
+          imagePath = value.path;
+        });
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> loadAssets() async {
@@ -73,145 +120,86 @@ class _ShareCaptureState extends State<ShareCapture> {
       resultList = await MultiImagePicker.pickImages(
         maxImages: 1,
       );
-    } on Exception catch (e) {
-      error = e.toString();
-    }
-    if (!mounted) return;
 
-    // TODO: send resultList to backend
-  }
+      List<MultipartFile> multipart = List<MultipartFile>();
 
-  Widget cameraControl(context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Container(
-          width: 75.0,
-          height: 75.0,
-          child: new RawMaterialButton(
-            fillColor: Colors.grey[300],
-            shape: new CircleBorder(),
-            elevation: 10.0,
-            child: Icon(
-              CupertinoIcons.camera_fill,
-              color: Colors.grey[700],
-              size: 35,
-            ),
-            onPressed: () {
-              onCapture(context);
-            },
-          ),
-        ),
-        Container(
-          width: 75.0,
-          height: 75.0,
-          child: new RawMaterialButton(
-            fillColor: Colors.grey[300],
-            shape: new CircleBorder(),
-            elevation: 10.0,
-            child: Icon(
-              CupertinoIcons.paperclip,
-              color: Colors.grey[700],
-              size: 35,
-            ),
-            onPressed: () {
-              loadAssets();
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    availableCameras().then((value) {
-      cameras = value;
-      if (cameras.length > 0) {
-        setState(() {
-          selectedCameraIndex = 0;
-        });
-        initCamera(cameras[selectedCameraIndex]).then((value) {});
-      } else {
-        print('No camera available');
+      for (int i = 0; i < resultList.length; i++) {
+        ByteData byteData = await resultList[i].getByteData();
+        List<int> imageData = byteData.buffer.asUint8List();
+        String fileName = "${resultList[i].name}";
+        multipart.add(MultipartFile.fromBytes(
+          imageData,
+          filename: fileName,
+        ));
       }
-    }).catchError((e) {
-      print('Error : ${e.code}');
-    });
-  }
-
-  onCapture(context) async {
-    try {
-      await cameraController.takePicture().then((value) async {
-        if (await Vibration.hasVibrator()) {
-          Vibration.vibrate(duration: 50);
-        }
-
+      if (multipart.isNotEmpty) {
+        image = multipart[0];
         setState(() {
           isImageCaptured = true;
-          imagePath = value.path;
-        });
-
-        String fileName = value.path.split('/').last;
-        FormData data = FormData.fromMap({
-          "image": await MultipartFile.fromFile(
-            value.path,
-            filename: fileName,
-          ),
-        });
-
-        Dio dio = new Dio();
-        dio
-            .post(baseURL + "image/", data: data)
-            .then((response) => print(response))
-            .catchError((error) => print(error));
-
-        setState(() {
-          numberOfImagesUploaded++;
-        });
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  void getRecipe() async {
-    setState(() {
-      isRecipeLoading = true;
-    });
-
-    String url = baseURL + 'scrape/';
-    try {
-      var response = await http.get(url);
-      if (response.statusCode == 200) {
-        //TODO: navigate to next screen
-      } else {
-        // Toast.show("Something wrong happened", context,
-        //     duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
-        // setState(() {
-        //   isRecipeLoading = false;
-        // });
-        Navigator.push(
-          context,
-          PageTransition(
-            duration: Duration(milliseconds: 500),
-            type: PageTransitionType.fade,
-            child: ShareScreen(),
-          ),
-        );
-        setState(() {
-          isRecipeLoading = false;
-          numberOfImagesUploaded = 0;
         });
       }
+    } on Exception catch (e) {
+      error = e.toString();
+      print(error);
+      Toast.show("Something wrong happened", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
+    }
+    if (!mounted) return;
+  }
+
+  shareFood() async {
+    try {
+      setState(() {
+        isImageCaptured = true;
+      });
+
+      Toast.show("Uploading Post!", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      FormData data = FormData.fromMap({
+        "email": FirebaseAuth.instance.currentUser.email,
+        "name": name,
+        "image": image,
+        "phone_no": phone,
+        "address": address,
+        "lat": position.latitude,
+        "lng": position.longitude,
+        "price": price,
+        "description": description,
+      });
+
+
+      Dio dio = new Dio();
+      var responseData = await dio.post(
+        baseURL + "/api/post-food/",
+        data: data,
+      );
+
+      if (responseData != null) {
+        print(responseData.data);
+        Navigator.pop(context);
+        Toast.show("Post Successful!", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      } else {
+        Toast.show("Something wrong happened", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
+        Navigator.pop(context);
+      }
+
+      setState(() {
+        isImageCaptured = false;
+        imagePath = null;
+      });
     } catch (e) {
       print(e);
       Toast.show("Something wrong happened", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
       setState(() {
-        isRecipeLoading = false;
+        isImageCaptured = false;
+        imagePath = null;
       });
     }
   }
@@ -224,7 +212,7 @@ class _ShareCaptureState extends State<ShareCapture> {
           children: <Widget>[
             Align(
               alignment: Alignment.topCenter,
-              child: !isImageCaptured
+              child: imagePath == null
                   ? cameraPreview()
                   : Image.asset(
                       imagePath,
@@ -248,7 +236,46 @@ class _ShareCaptureState extends State<ShareCapture> {
                         ),
                         height: 125,
                         width: double.infinity,
-                        child: cameraControl(context),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            Container(
+                              width: 75.0,
+                              height: 75.0,
+                              child: new RawMaterialButton(
+                                fillColor: Colors.grey[300],
+                                shape: new CircleBorder(),
+                                elevation: 10.0,
+                                child: Icon(
+                                  CupertinoIcons.camera_fill,
+                                  color: Colors.grey[700],
+                                  size: 35,
+                                ),
+                                onPressed: () {
+                                  onCapture(context);
+                                },
+                              ),
+                            ),
+                            Container(
+                              width: 75.0,
+                              height: 75.0,
+                              child: new RawMaterialButton(
+                                fillColor: Colors.grey[300],
+                                shape: new CircleBorder(),
+                                elevation: 10.0,
+                                child: Icon(
+                                  CupertinoIcons.paperclip,
+                                  color: Colors.grey[700],
+                                  size: 35,
+                                ),
+                                onPressed: () {
+                                  loadAssets();
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       )
                     : Hero(
                         tag: 'container',
@@ -278,7 +305,7 @@ class _ShareCaptureState extends State<ShareCapture> {
                                 SizedBox(height: 20),
                                 TextFormField(
                                   onChanged: (value) {
-                                    // TODO
+                                    name = value;
                                   },
                                   decoration: InputDecoration(
                                     labelText: 'Item name',
@@ -286,12 +313,12 @@ class _ShareCaptureState extends State<ShareCapture> {
                                       color: primaryAppColor,
                                     ),
                                     border: new OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: primaryAppColor),
+                                      borderSide: BorderSide(
+                                          color: primaryAppColor),
                                     ),
                                     focusedBorder: new OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: primaryAppColor),
+                                      borderSide: BorderSide(
+                                          color: primaryAppColor),
                                     ),
                                   ),
                                 ),
@@ -302,7 +329,7 @@ class _ShareCaptureState extends State<ShareCapture> {
                                       flex: 2,
                                       child: TextFormField(
                                         onChanged: (value) {
-                                          // TODO
+                                          phone = value;
                                         },
                                         keyboardType: TextInputType.phone,
                                         decoration: InputDecoration(
@@ -313,11 +340,13 @@ class _ShareCaptureState extends State<ShareCapture> {
                                           ),
                                           border: new OutlineInputBorder(
                                             borderSide: BorderSide(
-                                                color: primaryAppColor),
+                                              color: primaryAppColor,
+                                            ),
                                           ),
-                                          focusedBorder: new OutlineInputBorder(
+                                          focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
-                                                color: primaryAppColor),
+                                              color: primaryAppColor,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -327,7 +356,7 @@ class _ShareCaptureState extends State<ShareCapture> {
                                       flex: 1,
                                       child: TextFormField(
                                         onChanged: (value) {
-                                          // TODO
+                                          price = value;
                                         },
                                         keyboardType: TextInputType.number,
                                         decoration: InputDecoration(
@@ -338,11 +367,13 @@ class _ShareCaptureState extends State<ShareCapture> {
                                           ),
                                           border: new OutlineInputBorder(
                                             borderSide: BorderSide(
-                                                color: primaryAppColor),
+                                              color: primaryAppColor,
+                                            ),
                                           ),
-                                          focusedBorder: new OutlineInputBorder(
+                                          focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
-                                                color: primaryAppColor),
+                                              color: primaryAppColor,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -352,7 +383,7 @@ class _ShareCaptureState extends State<ShareCapture> {
                                 SizedBox(height: 10),
                                 TextFormField(
                                   onChanged: (value) {
-                                    // TODO
+                                    address = value;
                                   },
                                   decoration: InputDecoration(
                                     labelText: 'Home Address',
@@ -370,14 +401,39 @@ class _ShareCaptureState extends State<ShareCapture> {
                                   ),
                                 ),
                                 SizedBox(height: 10),
+                                TextFormField(
+                                  onChanged: (value) {
+                                    description = value;
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Description',
+                                    labelStyle: TextStyle(
+                                      color: primaryAppColor,
+                                    ),
+                                    border: new OutlineInputBorder(
+                                      borderSide:
+                                      BorderSide(color: primaryAppColor),
+                                    ),
+                                    focusedBorder: new OutlineInputBorder(
+                                      borderSide:
+                                      BorderSide(color: primaryAppColor),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
                                 InkWell(
-                                  onTap: () {},
+                                  onTap: () {
+                                    shareFood();
+                                  },
                                   child: Container(
                                     width: double.infinity,
                                     height: 55,
                                     decoration: BoxDecoration(
-                                        color: primaryAppColor,
-                                        borderRadius: BorderRadius.circular(5)),
+                                      color: primaryAppColor,
+                                      borderRadius: BorderRadius.circular(
+                                        5,
+                                      ),
+                                    ),
                                     child: Center(
                                       child: Text(
                                         'Share',

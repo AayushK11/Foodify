@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
-
-import '../../constants.dart';
+import '../../../constants.dart';
 
 class ShareDetailScreen extends StatefulWidget {
   final Map foodDetails;
@@ -30,6 +26,7 @@ class _ShareDetailScreenState extends State<ShareDetailScreen> {
             children: [
               Image.network(
                 widget.foodDetails["picture"],
+                // baseURL + widget.foodDetails["picture"],
                 fit: BoxFit.cover,
                 height: 500,
                 width: double.infinity,

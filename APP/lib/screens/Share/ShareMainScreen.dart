@@ -1,11 +1,12 @@
-import 'package:click_to_cook/screens/Share/ShareCapture.dart';
+import 'package:click_to_cook/screens/Share/ShareFood/ShareCapture.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:page_transition/page_transition.dart';
-
+import 'package:toast/toast.dart';
 import '../../constants.dart';
-import 'ShareDetailScreen.dart';
-import 'ShareScreen.dart';
+import 'GetFood/ShareScreen.dart';
 
 class ShareMainScreen extends StatefulWidget {
   @override
@@ -13,6 +14,93 @@ class ShareMainScreen extends StatefulWidget {
 }
 
 class _ShareMainScreenState extends State<ShareMainScreen> {
+  Map decodedDummyRecipeList = {
+    "result": [
+      {
+        "id": 1,
+        "picture":
+            "https://cdn1.foodviva.com/static-content/food-images/smoothie-recipes/apple-smoothie-recipe/apple-smoothie-recipe.jpg",
+        "address": "Vadgaon Budruk, Pune",
+        "phone_no": "9179279755",
+        "name": "Apple Smoothie",
+        "coordinates": "SRID=4326;POINT (73.8567 18.5204)",
+        "price": "69",
+        "email": "kanhapatildurg@gmail.com"
+      },
+      {
+        "id": 1,
+        "picture":
+            "https://cdn1.foodviva.com/static-content/food-images/smoothie-recipes/apple-smoothie-recipe/apple-smoothie-recipe.jpg",
+        "address": "Vadgaon Budruk, Pune",
+        "phone_no": "9179279755",
+        "name": "Apple Smoothie",
+        "coordinates": "SRID=4326;POINT (73.8567 18.5204)",
+        "price": "69",
+        "email": "kanhapatildurg@gmail.com"
+      },
+      {
+        "id": 1,
+        "picture":
+            "https://cdn1.foodviva.com/static-content/food-images/smoothie-recipes/apple-smoothie-recipe/apple-smoothie-recipe.jpg",
+        "address": "Vadgaon Budruk, Pune",
+        "phone_no": "9179279755",
+        "name": "Apple Smoothie",
+        "coordinates": "SRID=4326;POINT (73.8567 18.5204)",
+        "price": "69",
+        "email": "kanhapatildurg@gmail.com"
+      }
+    ]
+  };
+
+  gotoEatScreen() async {
+    try {
+      Toast.show("Loading Posts!", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
+
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      FormData data = FormData.fromMap({
+        "lat": position.latitude,
+        "lng": position.longitude,
+      });
+
+      Dio dio = new Dio();
+      var responseData = await dio.post(
+        baseURL + "/api/get-food/",
+        data: data,
+      );
+
+      if (responseData != null) {
+        print(responseData.data);
+        Navigator.push(
+            context,
+            PageTransition(
+              duration: Duration(seconds: 1),
+              type: PageTransitionType.fade,
+              child: ShareScreen(foodList: responseData.data),
+            ));
+      } else {
+        Navigator.push(
+            context,
+            PageTransition(
+              duration: Duration(seconds: 1),
+              type: PageTransitionType.fade,
+              child: ShareScreen(foodList: decodedDummyRecipeList),
+            ));
+      }
+    } catch (e) {
+      print(e);
+      Navigator.push(
+          context,
+          PageTransition(
+            duration: Duration(seconds: 1),
+            type: PageTransitionType.fade,
+            child: ShareScreen(foodList: decodedDummyRecipeList),
+          ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,13 +124,7 @@ class _ShareMainScreenState extends State<ShareMainScreen> {
               children: [
                 RaisedButton(
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                          duration: Duration(seconds: 1),
-                          type: PageTransitionType.fade,
-                          child: ShareScreen(),
-                        ));
+                    gotoEatScreen();
                   },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
