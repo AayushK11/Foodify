@@ -15,11 +15,7 @@ def get_client_ip(request):
 
 
 def recog_img(img):
-    result = predict_img(img)
-    print(result)
-
-
-recog_img("test.jpg")
+    return predict_img(img)
 
 
 def recipe_gen(query):
