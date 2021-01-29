@@ -1,0 +1,5 @@
+Final Epoch:
+28/28 [==============================] - 0s 6ms/step - loss: 0.1114 - accuracy: 0.9420 - val_loss: 0.1277 - val_accuracy: 0.9358
+
+Testing:
+5/5 [==============================] - 0s 15ms/step - val_loss: 0.1277 - val_accuracy: 0.9358
