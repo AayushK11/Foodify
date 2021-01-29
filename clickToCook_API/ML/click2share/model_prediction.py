@@ -19,12 +19,12 @@ BASE_DIR = settings.BASE_DIR
 
 
 def load_model():
-    json_file = open(BASE_DIR / "ML" / "click2Share" / "Model" /
+    json_file = open(BASE_DIR / "ML" / "click2share" / "Model" /
                      "CNN_Model.json", "r")
     loaded_model_json = json_file.read()
     json_file.close()
     model = model_from_json(loaded_model_json)
-    model.load_weights(BASE_DIR / "ML" / "click2Share" / "Model" /
+    model.load_weights(BASE_DIR / "ML" / "click2share" / "Model" /
                        "CNN_Weights.h5")
     return model
 
