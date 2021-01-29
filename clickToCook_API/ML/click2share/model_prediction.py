@@ -19,7 +19,7 @@ BASE_DIR = settings.BASE_DIR
 
 
 def load_model():
-    json_file = open(BASE_DIR / "ML" / "Model" / "click2Share" /
+    json_file = open(BASE_DIR / "ML" / "click2Share" / "Model" /
                      "CNN_Model.json", "r")
     loaded_model_json = json_file.read()
     json_file.close()
