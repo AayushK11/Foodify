@@ -41,14 +41,13 @@ def signup(request):
     return Response({"result": "Success"})
 
 
-
 # recognize shared image
 
 @api_view(["POST"])
 def recog_share_image(request):
     image = request.FILES.get("image", None)
     image = ShareImage.objects.create(image=image)
-    result = predict_share_img(image)
+    result = predict_share_img(image.image.path)
     image.result = result
     image.save()
     return Response({"result": result})
