@@ -1,11 +1,10 @@
+import cv2
+import numpy as np
+from keras.models import model_from_json
 import os
 from django.conf import settings
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-
-from keras.models import model_from_json
-import numpy as np
-import cv2
 
 
 BASE_DIR = settings.BASE_DIR
@@ -19,11 +18,13 @@ BASE_DIR = settings.BASE_DIR
 
 
 def load_model():
-    json_file = open(BASE_DIR / "ML" / "Model" / "CNN_Model.json", "r")
+    json_file = open(BASE_DIR / "ML" / "click2cook" / "Model" /
+                     "CNN_Model.json", "r")
     loaded_model_json = json_file.read()
     json_file.close()
     model = model_from_json(loaded_model_json)
-    model.load_weights(BASE_DIR / "ML" / "Model" / "CNN_Weights.h5")
+    model.load_weights(BASE_DIR / "ML" / "click2cook" / "Model" /
+                       "CNN_Weights.h5")
     return model
 
 
