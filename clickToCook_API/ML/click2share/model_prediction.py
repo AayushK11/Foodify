@@ -3,19 +3,20 @@ from django.conf import settings
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-from keras.models import model_from_json
-import numpy as np
 import cv2
+import numpy as np
+from keras.models import model_from_json
 
 
 BASE_DIR = settings.BASE_DIR
 
-# THIS IS USED TO CREATE PREDICTIONS
+# from data_pre_process import *
 
-# Takes an Image as an input and returns the predicted food item
-# Load Model loads the Saved model and fills the weight in it
-# Load Image converts the path into a image via cv2
-# Predict, processes the data, cleans and resizes it and predicts the food item
+# Load Model                -> Loads Model and Weights
+# Load Image                -> Reads Image from the path
+# Predict                   -> Resizes Image to 48x48, divides pixels by 32, and predicts
+# Model Prediction Handler  -> Handles the Module
+# Classes Available         -> ['Burger', 'Noodles', 'Pav Bhaji', 'Pizza', 'Rice', 'Sandwich']
 
 
 def load_model():
@@ -46,23 +47,9 @@ def predict(model, image):
     return index, confidence
 
 
-def predict_img(img):
-    tlab = ["Apple", "Banana", "Broccoli",
-            "Carrot", "Grape", "Orange", "Strawberry"]
-
-    model = load_model()
-    image = load_image(img)
-
-    index, confidence = predict(model, image)
-
-    print(">>> Confidence: " + "%.2f" % confidence)
-
-    return tlab[index]
-
-
 # def model_prediction_handler():
 #     model = load_model()
-#     tlab = ["Apple", "Banana", "Broccoli", "Carrot", "Grape", "Orange", "Strawberry"]
+#     tlab = ["Burger", "Noodles", "Pav Bhaji", "Pizza", "Rice", "Sandwich"]
 
 #     for i in os.listdir("Private Test"):
 #         path = os.path.join("Private Test", i)
@@ -71,7 +58,13 @@ def predict_img(img):
 #         print(i, tlab[index], "%.2f" % confidence)
 
 
-# model_prediction_handler()
+def predict_img(img):
+    tlab = ["Burger", "Noodles", "Pav Bhaji", "Pizza", "Rice", "Sandwich"]
+    model = load_model()
+    image = load_image(img)
+    index, confidence = predict(model, image)
+    print(">>> Confidence: " + "%.2f" % confidence)
+    return tlab[index]
 
-# result = predict_img("test.jpg")
-# print(result)
+
+# model_prediction_handler()

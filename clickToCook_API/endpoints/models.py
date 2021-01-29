@@ -35,3 +35,9 @@ class FoodPost(models.Model):
     name = models.CharField(max_length=55)
     coordinates = models.PointField()
     price = models.CharField(max_length=5)
+
+
+class ShareImage(models.Model):
+
+    image = models.ImageField(upload_to="share_images")
+    result = models.TextField(default="")
