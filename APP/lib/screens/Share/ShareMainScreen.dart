@@ -23,6 +23,7 @@ class _ShareMainScreenState extends State<ShareMainScreen> {
         "address": "Vadgaon Budruk, Pune",
         "phone_no": "9179279755",
         "name": "Apple Smoothie",
+        "description": "I have an extra smoothie. Please come and take it. This ad is negotiable",
         "coordinates": "SRID=4326;POINT (73.8567 18.5204)",
         "price": "69",
         "email": "kanhapatildurg@gmail.com"
@@ -34,6 +35,7 @@ class _ShareMainScreenState extends State<ShareMainScreen> {
         "address": "Vadgaon Budruk, Pune",
         "phone_no": "9179279755",
         "name": "Apple Smoothie",
+        "description": "I have an extra smoothie. Please come and take it. This ad is negotiable",
         "coordinates": "SRID=4326;POINT (73.8567 18.5204)",
         "price": "69",
         "email": "kanhapatildurg@gmail.com"
@@ -45,6 +47,7 @@ class _ShareMainScreenState extends State<ShareMainScreen> {
         "address": "Vadgaon Budruk, Pune",
         "phone_no": "9179279755",
         "name": "Apple Smoothie",
+        "description": "I have an extra smoothie. Please come and take it. This ad is negotiable",
         "coordinates": "SRID=4326;POINT (73.8567 18.5204)",
         "price": "69",
         "email": "kanhapatildurg@gmail.com"
