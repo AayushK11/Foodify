@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:click_to_cook/constants.dart';
-import 'package:click_to_cook/screens/Recipe/RecipeCapture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -73,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   color: textColor,
-                  fontFamily: secondaryFont
+                  fontFamily: secondaryFont,
                 ),
               ),
             ),

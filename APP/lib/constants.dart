@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 String appName = 'Click2Cook';
-String baseURL = "https://7279ed3b0a64.ngrok.io";
+String baseURL = "https://d612d9b32897.ngrok.io";
 
 Color primaryAppColor = Color(0xffe55d72);
 Color secondaryAppColor = Color(0xff72e55d);

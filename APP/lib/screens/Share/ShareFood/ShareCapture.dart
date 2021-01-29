@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:click_to_cook/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,7 +14,6 @@ import 'package:toast/toast.dart';
 import 'package:vibration/vibration.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-
 import '../GetFood/ShareScreen.dart';
 import 'ShareProfileScreen.dart';
 
@@ -31,7 +30,7 @@ class _ShareCaptureState extends State<ShareCapture> {
   bool isImageCaptured = false;
   String imagePath;
   String name, address, phone, price, description;
-  var image, galleryImage;
+  var image, imageForSharing;
 
   var dummyDecodedData = {
     "result": [
@@ -129,7 +128,10 @@ class _ShareCaptureState extends State<ShareCapture> {
           value.path,
           filename: fileName,
         );
-        galleryImage = image;
+        imageForSharing = await MultipartFile.fromFile(
+          value.path,
+          filename: fileName,
+        );
 
         setState(() {
           imagePath = value.path;
@@ -139,24 +141,24 @@ class _ShareCaptureState extends State<ShareCapture> {
             duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
 
         try {
-          //   FormData data = FormData.fromMap({
-          //     "image": image,
-          //   });
-          //
-          //   Dio dio = new Dio();
-          //   var responseData = await dio.post(
-          //     baseURL + "/api/share-image/",
-          //     data: data,
-          //   );
-          //
-          //   if (responseData != null) {
-          //     name = responseData.data['result'];
-          //   } else {
-          //     name = 'apple';
-          //     print("Something went wrong");
-          //   }
+          FormData data = FormData.fromMap({
+            "image": image,
+          });
+
+          Dio dio = new Dio();
+          var responseData = await dio.post(
+            baseURL + "/api/share-image/",
+            data: data,
+          );
+
+          if (responseData != null) {
+            name = responseData.data['result'];
+          } else {
+            name = 'sandwich';
+            print("Something went wrong");
+          }
         } catch (e) {
-          name = 'apple';
+          name = 'sandwich';
           print("Something went wrong");
           print(e);
         }
@@ -166,7 +168,7 @@ class _ShareCaptureState extends State<ShareCapture> {
         });
       });
     } catch (e) {
-      name = 'apple';
+      name = 'sandwich';
       print("Something went wrong");
       print(e);
     }
@@ -174,54 +176,44 @@ class _ShareCaptureState extends State<ShareCapture> {
 
   Future<void> loadAssets() async {
     List<Asset> resultList;
-    String error;
 
     try {
       resultList = await MultiImagePicker.pickImages(
         maxImages: 1,
       );
 
-      List<MultipartFile> multipart = List<MultipartFile>();
+      ByteData byteData = await resultList[0].getByteData();
+      image = MultipartFile.fromBytes(byteData.buffer.asUint8List(),
+          filename: resultList[0].name);
 
-      for (int i = 0; i < resultList.length; i++) {
-        ByteData byteData = await resultList[i].getByteData();
-        List<int> imageData = byteData.buffer.asUint8List();
-        String fileName = "${resultList[i].name}";
-        multipart.add(MultipartFile.fromBytes(
-          imageData,
-          filename: fileName,
-        ));
+      imageForSharing = MultipartFile.fromBytes(byteData.buffer.asUint8List(),
+          filename: resultList[0].name);
+
+      FormData data = FormData.fromMap({
+        "image": image,
+      });
+
+      Dio dio = new Dio();
+      var responseData = await dio.post(
+        baseURL + "/api/share-image/",
+        data: data,
+      );
+
+      if (responseData != null) {
+        name = responseData.data['result'];
+      } else {
+        name = 'sandwich';
       }
-      if (multipart.isNotEmpty) {
-        image = multipart[0];
-        galleryImage = multipart[0];
 
-        // FormData data = FormData.fromMap({
-        //   "image": image,
-        // });
-
-        // Dio dio = new Dio();
-        // var responseData = await dio.post(
-        //   baseURL + "/api/share-image/",
-        //   data: data,
-        // );
-
-        // if (responseData != null) {
-        //   name = responseData.data['result'];
-        // } else {
-        name = 'apple';
-        //   print("Something went wrong");
-        // }
-
-        setState(() {
-          isImageCaptured = true;
-        });
-      }
-    } on Exception catch (e) {
-      error = e.toString();
-      print(error);
-      Toast.show("Something went wrong", context,
-          duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
+      setState(() {
+        isImageCaptured = true;
+      });
+    } catch (e) {
+      name = 'sandwich';
+      setState(() {
+        isImageCaptured = true;
+      });
+      print(e);
     }
     if (!mounted) return;
   }
@@ -241,7 +233,7 @@ class _ShareCaptureState extends State<ShareCapture> {
       FormData data = FormData.fromMap({
         "email": FirebaseAuth.instance.currentUser.email,
         "name": name,
-        "image": galleryImage,
+        "image": imageForSharing,
         "phone_no": phone,
         "address": address,
         "lat": position.latitude,
@@ -261,10 +253,6 @@ class _ShareCaptureState extends State<ShareCapture> {
         Navigator.pop(context);
         Toast.show("Post Successful!", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-      } else {
-        Toast.show("Something went wrong", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
-        Navigator.pop(context);
       }
 
       setState(() {
@@ -273,12 +261,7 @@ class _ShareCaptureState extends State<ShareCapture> {
       });
     } catch (e) {
       print(e);
-      Toast.show("Something went wrong", context,
-          duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
-      setState(() {
-        isImageCaptured = false;
-        imagePath = null;
-      });
+      Navigator.pop(context);
     }
   }
 
@@ -286,7 +269,6 @@ class _ShareCaptureState extends State<ShareCapture> {
     try {
       Toast.show("Profile Loading...", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.CENTER);
-
 
       FormData data = FormData.fromMap({
         "email": FirebaseAuth.instance.currentUser.email,
@@ -338,8 +320,8 @@ class _ShareCaptureState extends State<ShareCapture> {
               alignment: Alignment.topCenter,
               child: imagePath == null
                   ? cameraPreview()
-                  : Image.asset(
-                      imagePath,
+                  : Image.file(
+                      File(imagePath),
                       width: double.infinity,
                       height: double.infinity,
                       fit: BoxFit.cover,
