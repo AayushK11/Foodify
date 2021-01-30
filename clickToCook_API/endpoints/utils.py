@@ -65,7 +65,7 @@ def idnetify_image(image, ip_addr_param):
     return context
 
 
-def recipe_gen(ip_address):
+def u_recipe_gen(ip_address):
     ip_addr = IPADDR.objects.get(ip_addr=ip_address)
     img_objs = Image.objects.filter(ip_addr=ip_addr)
     query = ""

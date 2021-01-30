@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from endpoints.utils import create_ip, idnetify_image, get_client_ip, recipe_gen, predict_share_img, req_post_getter
+from endpoints.utils import create_ip, idnetify_image, get_client_ip, predict_share_img, req_post_getter, u_recipe_gen
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from endpoints.models import Image, IPADDR, EmUser, FoodPost, ShareImage
@@ -21,14 +21,14 @@ def bulk_images(request):
     images = request.FILES.getlist("images[]", [])
     for image in images:
         idnetify_image(image, ip_addr)
-    context = recipe_gen(ip_addr)
+    context = u_recipe_gen(ip_addr)
     return Response(context)
 
 
 @api_view(["GET"])
 def get_recipes(request):
     ip_addr = get_client_ip(request)
-    context = recipe_gen(ip_addr)
+    context = u_recipe_gen(ip_addr)
     return Response(context)
 
 

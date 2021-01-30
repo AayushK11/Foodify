@@ -33,6 +33,7 @@ class FoodPost(models.Model):
     address = models.TextField()
     phone_no = models.CharField(max_length=15)
     name = models.CharField(max_length=55)
+    description = models.TextField(max_length=1000)
     coordinates = models.PointField()
     price = models.CharField(max_length=5)
 
