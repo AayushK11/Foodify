@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('currentUser', currentUser.toString());
+
+    FormData data = FormData.fromMap({
+      "email": FirebaseAuth.instance.currentUser.email,
+    });
+
+    Dio dio = new Dio();
+    var responseData = await dio.post(baseURL + "/api/sign-up/", data: data);
+    print(responseData);
 
     if (currentUser != null) {
       Navigator.pushAndRemoveUntil(

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:click_to_cook/constants.dart';
-import 'package:click_to_cook/screens/Recipe/RecipeCapture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
@@ -39,23 +38,42 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primaryAppColor,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          Hero(
-            tag: 'logo',
-            child: Image.asset(
-              'assets/images/logo.png',
-              scale: 4,
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Hero(
+                tag: 'logo',
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  scale: 4,
+                ),
+              ),
+              Center(
+                child: Text(
+                  'Foodify',
+                  style: TextStyle(
+                    fontSize: 40,
+                    color: textColor,
+                    fontFamily: primaryFont,
+                  ),
+                ),
+              ),
+            ],
           ),
-          Center(
-            child: Text(
-              appName,
-              style: TextStyle(
-                fontSize: 40,
-                color: textColor,
-                fontFamily: primaryFont,
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 200.0),
+              child: Text(
+                "Turn your leftovers into\ndelicious food or money.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: textColor,
+                  fontFamily: secondaryFont,
+                ),
               ),
             ),
           ),

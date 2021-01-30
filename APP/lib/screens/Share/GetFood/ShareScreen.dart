@@ -2,54 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
-import '../../constants.dart';
-import 'ShareDetailScreen.dart';
+import '../../../constants.dart';
+import 'ShareDetailsScreen.dart';
 
 class ShareScreen extends StatefulWidget {
+  final Map foodList;
+
+  ShareScreen({@required this.foodList});
+
   @override
   _ShareScreenState createState() => _ShareScreenState();
 }
 
 class _ShareScreenState extends State<ShareScreen> {
-  Map decodedDummyRecipeList = {
-    "result": [
-      {
-        "id": 1,
-        "picture":
-            "https://cdn1.foodviva.com/static-content/food-images/smoothie-recipes/apple-smoothie-recipe/apple-smoothie-recipe.jpg",
-        "address": "Vadgaon Budruk, Pune",
-        "phone_no": "9179279755",
-        "name": "Apple Smoothie",
-        "coordinates": "SRID=4326;POINT (73.8567 18.5204)",
-        "price": "69",
-        "email": "kanhapatildurg@gmail.com"
-      },
-      {
-        "id": 1,
-        "picture":
-        "https://cdn1.foodviva.com/static-content/food-images/smoothie-recipes/apple-smoothie-recipe/apple-smoothie-recipe.jpg",
-        "address": "Vadgaon Budruk, Pune",
-        "phone_no": "9179279755",
-        "name": "Apple Smoothie",
-        "coordinates": "SRID=4326;POINT (73.8567 18.5204)",
-        "price": "69",
-        "email": "kanhapatildurg@gmail.com"
-      },
-      {
-        "id": 1,
-        "picture":
-        "https://cdn1.foodviva.com/static-content/food-images/smoothie-recipes/apple-smoothie-recipe/apple-smoothie-recipe.jpg",
-        "address": "Vadgaon Budruk, Pune",
-        "phone_no": "9179279755",
-        "name": "Apple Smoothie",
-        "coordinates": "SRID=4326;POINT (73.8567 18.5204)",
-        "price": "69",
-        "email": "kanhapatildurg@gmail.com"
-      }
-    ]
-  };
-
-  Widget recipeCard(String title, String address, String imgURL, String price,
+  Widget foodCard(String title, String address, String imgURL, String price,
       Map foodDetails) {
     return Padding(
       padding: const EdgeInsets.only(top: 15.0, left: 15.0, right: 15.0),
@@ -74,7 +40,7 @@ class _ShareScreenState extends State<ShareScreen> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10.0),
                           child: Image.network(
-                            imgURL,
+                            baseURL + imgURL,
                             fit: BoxFit.cover,
                             width: 100,
                             height: 100,
@@ -97,11 +63,14 @@ class _ShareScreenState extends State<ShareScreen> {
                                 fontFamily: secondaryFont),
                           ),
                           SizedBox(height: 10.0),
-                          Text(
-                            address,
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontFamily: secondaryFont,
+                          Padding(
+                            padding: const EdgeInsets.only(right: 60.0),
+                            child: Text(
+                              address,
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontFamily: secondaryFont,
+                              ),
                             ),
                           ),
                           Padding(
@@ -114,11 +83,10 @@ class _ShareScreenState extends State<ShareScreen> {
                                 Text(
                                   '₹ ' + price,
                                   style: TextStyle(
-                                    fontSize: 20,
-                                    color: primaryAppColor,
-                                    fontFamily: secondaryFont,
-                                    fontWeight: FontWeight.bold
-                                  ),
+                                      fontSize: 20,
+                                      color: primaryAppColor,
+                                      fontFamily: secondaryFont,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -134,10 +102,9 @@ class _ShareScreenState extends State<ShareScreen> {
               Navigator.push(
                 context,
                 PageTransition(
+                  duration: Duration(milliseconds: 500),
                   type: PageTransitionType.fade,
-                  child: ShareDetailScreen(
-                    foodDetails: foodDetails,
-                  ),
+                  child: ShareDetailsScreen(foodList: foodDetails),
                 ),
               );
             },
@@ -173,16 +140,14 @@ class _ShareScreenState extends State<ShareScreen> {
               ListView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: decodedDummyRecipeList["result"].length,
+                itemCount: widget.foodList["result"].length,
                 itemBuilder: (BuildContext context, int index) {
-                  return recipeCard(
-                    decodedDummyRecipeList["result"][index]['name'].toString(),
-                    decodedDummyRecipeList["result"][index]['address']
-                        .toString(),
-                    decodedDummyRecipeList["result"][index]['picture']
-                        .toString(),
-                    decodedDummyRecipeList["result"][index]['price'].toString(),
-                    decodedDummyRecipeList["result"][index],
+                  return foodCard(
+                    widget.foodList["result"][index]['name'].toString(),
+                    widget.foodList["result"][index]['address'].toString(),
+                    widget.foodList["result"][index]['picture'].toString(),
+                    widget.foodList["result"][index]['price'].toString(),
+                    widget.foodList["result"][index],
                   );
                 },
               ),

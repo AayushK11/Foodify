@@ -1,6 +1,7 @@
 import 'package:click_to_cook/screens/SplashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       home: SplashScreen(),
+      builder: EasyLoading.init(),
     );
   }
 }
